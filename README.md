@@ -4,15 +4,17 @@ This is a Jupyter notebook containing code written in Python, using the Keras li
 
 During my masters degree, I have taken the course Artificial Neural Networks. The project of the course was to classify first the MNIST dataset of numbers, then the fashion-MNIST dataset, using (convolutional) neural networks. To this end, we use the Keras and Tensorflow libraries of Python. We changed the various parameters of the neural networks to find out which set of parameters gave us the lowest testing error. The parameters studied were: number of hidden layers, type of optimizer (SGD or Adam), size of the learning rate, number of hidden neurons per layer, type of regularization, size of the regularization constant. Below is the code for the final convolutional neural networks used in the last question of the notebook. First we load the data and reshape it:
 
+```
 (x_fashion_train_conv, y_fashion_train_conv), (x_fashion_test_conv, y_fashion_test_conv) = keras.datasets.fashion_mnist.load_data()
 x_fashion_train_conv = np.expand_dims(x_fashion_train_conv, -1)
 x_fashion_test_conv = np.expand_dims(x_fashion_test_conv, -1)
 y_fashion_train_conv = y_fashion_train
 y_fashion_test_conv = y_fashion_test
-
+```
 
 Then we provide the method to build the network
 
+```
 def build_convolutional_network(number_of_hidden_layers = 0, units = 100, optimizer="sgd", lr = 0.01, momentum = 0.9, dropOut = None, regularization_kernel = 0, regularization_bias = 0, batchNormalization = False) :
     model = Sequential()
     model.add(Conv2D(units, (3, 3), activation="relu", input_shape=(28, 28, 1), kernel_regularizer=regularizers.l2(regularization_kernel), bias_regularizer=regularizers.l2(regularization_bias)))
@@ -42,11 +44,11 @@ def build_convolutional_network(number_of_hidden_layers = 0, units = 100, optimi
 
     model.compile(loss="categorical_crossentropy", metrics=["accuracy"], optimizer=opt)
     return model
-
+```
 
 Then we build three different neural networks and we compare them
 
-
+```
 model_batch = build_convolutional_network(number_of_hidden_layers = 1, units = 100, optimizer="adam", lr = 0.01, batchNormalization=True)
 history_batch = model_batch.fit(x_fashion_train_conv, y_fashion_train_conv, batch_size=128, epochs=20, verbose=0, validation_data=(x_fashion_test_conv, y_fashion_test_conv))
 print("Best validation accuracy for a convolutional neural network with batch normalization: " + str(max(history_batch.history["val_accuracy"])))
@@ -61,7 +63,7 @@ print("Best validation accuracy for a convolutional neural network with regulari
 plot_history(history_batch,"With batch normalization")
 plot_history(history_drop,"With dropout of 0.1")
 plot_history(history_reg,"With kernel and bias regularization of 0.01")
-
+```
 
 The comparative plots of the three different neural networks are as follows. We can see a comparison of the validation and testing accuracies and cross-entropies.
 
@@ -73,12 +75,13 @@ The comparative plots of the three different neural networks are as follows. We 
 
 We then construct an optimal convolutional neural network and compare it with a basic neural network.
 
+```
 model_optimal = build_convolutional_network(number_of_hidden_layers = 1, units = 100, optimizer="adam", batchNormalization=True, dropOut=0.1)
 history_optimal = model_optimal.fit(x_fashion_train_conv, y_fashion_train_conv, batch_size=128, epochs=20, verbose=0, validation_data=(x_fashion_test_conv, y_fashion_test_conv))
 
 fig_comparison = comparison_plot(history_6_1, history_optimal, "Naive model", "Optimized model", "Effect of tricks and regularization")
 fig_comparison.set_size_inches(20,8)
-
+```
 The following plots are obtained.
 
 ![alt text](https://github.com/aiday-mar/Keras-Image-Classification/blob/main/nn4.PNG?raw=true)
